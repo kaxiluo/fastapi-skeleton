@@ -1,0 +1,2 @@
+# fastapi-skeleton
+fastapi skeleton
