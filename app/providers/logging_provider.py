@@ -2,12 +2,12 @@ import logging
 import sys
 from loguru import logger
 
-from app.providers.service_provider import ServiceProvider
+from app.providers.provider import Provider
 
 from config.logging import settings
 
 
-class LoggingServiceProvider(ServiceProvider):
+class LoggingProvider(Provider):
 
     def register(self):
         level = settings.LOG_LEVEL

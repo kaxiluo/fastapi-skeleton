@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from fastapi import FastAPI
 
 
-class ServiceProvider(metaclass=ABCMeta):
+class Provider(metaclass=ABCMeta):
 
     def __init__(self, app: FastAPI):
         self.app = app

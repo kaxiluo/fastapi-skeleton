@@ -1,8 +1,8 @@
-from app.providers.service_provider import ServiceProvider
+from app.providers.provider import Provider
 from routes.api import api_router
 
 
-class RouteServiceProvider(ServiceProvider):
+class RouteProvider(Provider):
 
     def boot(self):
         # 注册api路由[routes/api.py]

@@ -3,12 +3,12 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
 
 from app.exceptions.exception import AuthenticationError, AuthorizationError
-from app.providers.service_provider import ServiceProvider
+from app.providers.provider import Provider
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi import Request
 
 
-class HandleException(ServiceProvider):
+class HandleException(Provider):
 
     def register(self):
         app = self.app
