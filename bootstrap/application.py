@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 
 from app.providers.app_service_provider import AppServiceProvider
+from app.providers.handle_exception import HandleException
 from app.providers.logging_service_provider import LoggingServiceProvider
 from app.providers.route_service_provider import RouteServiceProvider
 from app.providers.service_provider import ServiceProvider
@@ -11,6 +12,7 @@ providers: list = [
     # Framework Service Providers
     AppServiceProvider,
     LoggingServiceProvider,
+    HandleException,
     RouteServiceProvider
 ]
 
