@@ -3,3 +3,5 @@ pydantic~=1.9.1
 uvicorn~=0.18.1
 loguru~=0.6.0
 pydantic[dotenv]
+peewee~=3.15.1
+pymysql
