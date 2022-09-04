@@ -20,7 +20,7 @@ async def db():
     database.db.create_tables([models.User])
     models.User.create(username='fastapi', email='fastapi@fastapi.com')
     models.User.create(username='kaxiluo', email='kaxiluo@kaxiluo.com')
-    return "demo db"
+    return "table users create and insert success"
 
 
 @router.get("/db_query")

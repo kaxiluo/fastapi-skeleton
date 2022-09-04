@@ -2,33 +2,29 @@ import logging
 import sys
 from loguru import logger
 
-from app.providers.provider import Provider
-
 from config.logging import settings
 
 
-class LoggingProvider(Provider):
+def register(app=None):
+    level = settings.LOG_LEVEL
+    path = settings.LOG_PATH
+    retention = settings.LOG_RETENTION
 
-    def register(self):
-        level = settings.LOG_LEVEL
-        path = settings.LOG_PATH
-        retention = settings.LOG_RETENTION
+    # intercept everything at the root logger
+    logging.root.handlers = [InterceptHandler()]
+    logging.root.setLevel(level)
 
-        # intercept everything at the root logger
-        logging.root.handlers = [InterceptHandler()]
-        logging.root.setLevel(level)
+    # remove every other logger's handlers
+    # and propagate to root logger
+    for name in logging.root.manager.loggerDict.keys():
+        logging.getLogger(name).handlers = []
+        logging.getLogger(name).propagate = True
 
-        # remove every other logger's handlers
-        # and propagate to root logger
-        for name in logging.root.manager.loggerDict.keys():
-            logging.getLogger(name).handlers = []
-            logging.getLogger(name).propagate = True
-
-        # configure loguru
-        logger.configure(handlers=[
-            {"sink": sys.stdout},
-            {"sink": path, "rotation": "00:00", "retention": retention},
-        ])
+    # configure loguru
+    logger.configure(handlers=[
+        {"sink": sys.stdout},
+        {"sink": path, "rotation": "00:00", "retention": retention},
+    ])
 
 
 class InterceptHandler(logging.Handler):

@@ -8,5 +8,8 @@ class Settings(BaseSettings):
     USER: str = 'root'
     PASSWORD: str = '123456'
 
+    class Config:
+        env_prefix = 'DB_'
+
 
 settings = Settings()

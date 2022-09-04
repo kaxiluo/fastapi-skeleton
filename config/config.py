@@ -16,8 +16,6 @@ class Settings(BaseSettings):
     URL: str = "http://localhost"
     TIME_ZONE: str = "RPC"
 
-
-
     class Config:
         env_prefix = 'APP_'
         env_file = ".env"
