@@ -2,6 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.providers.database import db
 from app.providers.provider import Provider
+from app.providers.scheduler import schedule
 from config.config import settings
 
 
@@ -35,10 +36,12 @@ class AppProvider(Provider):
         @app.on_event("startup")
         def startup():
             db.connect()
+            schedule.start()
 
         # This hook ensures that the connection is closed when we've finished
         # processing the request.
         @app.on_event("shutdown")
         def shutdown():
+            schedule.shutdown()
             if not db.is_closed():
                 db.close()
