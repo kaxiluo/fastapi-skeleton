@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from app.models.user import User
+
 router = APIRouter(
     prefix="/demo"
 )
@@ -8,6 +10,11 @@ router = APIRouter(
 @router.get("/")
 async def index():
     return "demo index"
+
+
+@router.get("/db")
+async def db():
+    User.create(username='fake_user1')
 
 
 @router.get("/{demo_id}")
