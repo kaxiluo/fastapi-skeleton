@@ -33,17 +33,3 @@ db = PooledMySQLDatabase(
 )
 
 db._state = PeeweeConnectionState()
-
-
-class BaseModel(Model):
-    deleted_at = DateTimeField(null=True)
-    created_at = DateTimeField(default=datetime.datetime.now())
-    updated_at = DateTimeField(default=datetime.datetime.now())
-
-    @classmethod
-    def undelete(cls):
-        # for logic delete
-        return cls.select().where(SQL("deleted_at is NULL"))
-
-    class Meta:
-        database = db

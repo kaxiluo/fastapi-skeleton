@@ -1,6 +1,6 @@
 from peewee import CharField, DateTimeField
 
-from app.providers.database import BaseModel
+from app.models.base_model import BaseModel
 
 
 class User(BaseModel):

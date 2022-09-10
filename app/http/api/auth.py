@@ -1,9 +1,9 @@
 import logging
 
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter
 
-from app.services.auth import password_grant
+from app.services.auth.grant import PasswordGrant, CellphoneGrant
+from app.services.auth.oauth2_schema import OAuth2PasswordRequest, OAuth2CellphoneRequest
 
 router = APIRouter(
     prefix="/auth"
@@ -11,5 +11,18 @@ router = APIRouter(
 
 
 @router.post("/token")
-async def token(form_data: OAuth2PasswordRequestForm = Depends()):
-    return password_grant.respond_to_access_token_request(form_data)
+async def token(request_data: OAuth2PasswordRequest):
+    """
+    用户名+密码登录
+    """
+    grant = PasswordGrant(request_data)
+    return grant.respond()
+
+
+@router.post("/cellphone/token")
+async def cellphone_token(request_data: OAuth2CellphoneRequest):
+    """
+    手机号+验证码登录
+    """
+    grant = CellphoneGrant(request_data)
+    return grant.respond()
