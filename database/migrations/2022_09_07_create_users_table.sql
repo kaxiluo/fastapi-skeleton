@@ -14,9 +14,16 @@ CREATE TABLE `users` (
   `avatar` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '头像',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `udx_username` (`username`),
   UNIQUE KEY `udx_cellphone` (`cellphone`),
   UNIQUE KEY `udx_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+/*
+* 插入用户，密码均为123456
+*/
+INSERT  INTO `users`(`id`,`username`,`password`,`created_at`,`updated_at`) VALUES
+(1,'fake_user1','$2b$12$qn3Hjh8zCfYsSnbqHBq63eXjaTwWs4r/SH3yLycDAOTFUi80em6Ju',NOW(),NOW()),
+(2,'fake_user2','$2b$12$qn3Hjh8zCfYsSnbqHBq63eXjaTwWs4r/SH3yLycDAOTFUi80em6Ju',NOW(),NOW());

@@ -4,7 +4,7 @@ from app.exceptions.exception import AuthenticationError
 from app.models.user import User
 from app.services.auth import jwt_helper, hashing, random_code_verifier
 from app.services.auth.oauth2_schema import OAuth2CellphoneRequest, OAuth2PasswordRequest
-from app.support.helper import alpha_numeric_random
+from app.support.helper import alphanumeric_random
 from config.auth import settings
 
 
@@ -53,8 +53,8 @@ class CellphoneGrant:
         user = User.get_or_none(User.cellphone == cellphone)
         # 验证通过，用户不存在则创建
         if not user:
-            username = 'srcp_' + alpha_numeric_random()
-            password = hashing.get_password_hash(alpha_numeric_random())
+            username = 'srcp_' + alphanumeric_random()
+            password = hashing.get_password_hash(alphanumeric_random())
             user = User.create(cellphone=cellphone, username=username, password=password)
 
         # 用户状态校验

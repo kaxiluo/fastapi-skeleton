@@ -16,7 +16,9 @@ def get_auth_user(
 ) -> User:
     try:
         payload = jwt_helper.get_payload_by_token(token)
-    except (jwt.JWTError, jwt.ExpiredSignatureError, jwt.JWTClaimsError):
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationError(message="Token Expired")
+    except (jwt.JWTError, jwt.JWTClaimsError):
         raise AuthenticationError(message="Could not validate credentials")
 
     user_id = payload.get('sub')
