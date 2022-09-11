@@ -1,4 +1,4 @@
-from peewee import CharField, DateTimeField
+from peewee import CharField, DateTimeField, IntegerField
 
 from app.models.base_model import BaseModel
 
@@ -7,6 +7,7 @@ class User(BaseModel):
     class Meta:
         table_name = 'users'
 
+    id = IntegerField(primary_key=True)
     username = CharField(unique=True)
     password = CharField()
     cellphone = CharField(unique=True)

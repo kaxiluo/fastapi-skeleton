@@ -16,3 +16,7 @@ def create_access_token(
     to_encode = {"exp": expire, "sub": str(subject)}
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
+
+
+def get_payload_by_token(encoded_jwt):
+    return jwt.decode(encoded_jwt, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
