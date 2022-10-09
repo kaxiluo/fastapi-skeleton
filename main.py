@@ -7,7 +7,7 @@ app = create_app()
 
 @app.get("/")
 async def root():
-    return "welcome to fastapi app"
+    return "welcome to fastapi skeleton"
 
 
 if __name__ == "__main__":

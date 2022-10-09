@@ -12,4 +12,7 @@ router = APIRouter(
 
 @router.get("/me", response_model=UserDetail)
 def me(auth_user: User = Depends(deps.get_auth_user)):
+    """
+    当前登录用户信息
+    """
     return model_to_dict(auth_user)
