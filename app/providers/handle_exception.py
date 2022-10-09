@@ -10,11 +10,17 @@ from fastapi import Request
 def register(app):
 
     @app.exception_handler(AuthenticationError)
-    async def custom_http_exception_handler(request: Request, e: AuthenticationError):
+    async def authentication_exception_handler(request: Request, e: AuthenticationError):
+        """
+        认证异常处理
+        """
         return JSONResponse(status_code=401, content={"message": e.message})
 
     @app.exception_handler(AuthorizationError)
-    async def custom_http_exception_handler(request: Request, e: AuthorizationError):
+    async def authorization_exception_handler(request: Request, e: AuthorizationError):
+        """
+        权限异常处理
+        """
         return JSONResponse(status_code=403, content={"message": e.message})
 
     @app.exception_handler(StarletteHTTPException)
