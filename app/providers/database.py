@@ -1,7 +1,6 @@
-import datetime
 from contextvars import ContextVar
 
-from peewee import _ConnectionState, Model, DateTimeField, SQL
+from peewee import _ConnectionState, MySQLDatabase
 from playhouse.pool import PooledMySQLDatabase
 
 from config.database import settings
@@ -22,10 +21,13 @@ class PeeweeConnectionState(_ConnectionState):
         return self._state.get()[name]
 
 
-db = PooledMySQLDatabase(
+async def reset_db_state():
+    db._state._state.set(db_state_default.copy())
+    db._state.reset()
+
+
+db = MySQLDatabase(
     settings.DATABASE,
-    max_connections=8,
-    stale_timeout=300,
     user=settings.USER,
     host=settings.HOST,
     password=settings.PASSWORD,

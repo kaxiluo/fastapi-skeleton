@@ -14,6 +14,9 @@ class UserBase(BaseModel):
     gender: str
     avatar: str
 
+    class Config:
+        orm_mode = True
+
 
 class UserDetail(UserBase):
     cellphone: Optional[str] = None

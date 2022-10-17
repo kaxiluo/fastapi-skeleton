@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.exceptions.exception import AuthenticationError
 from app.models.user import User
+from app.providers import database
+from app.providers.database import reset_db_state
 from app.services.auth import jwt_helper
 from jose import jwt
 
@@ -29,3 +31,12 @@ def get_auth_user(
     if not user.is_enabled():
         raise AuthenticationError(message='Inactive user')
     return user
+
+
+def get_db(db_state=Depends(reset_db_state)):
+    try:
+        database.db.connect()
+        yield
+    finally:
+        if not database.db.is_closed():
+            database.db.close()

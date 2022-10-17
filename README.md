@@ -37,7 +37,7 @@
 |   |-- providers                               ----- 核心服务提供者
 |   |   |-- __init__.py
 |   |   |-- app_provider.py                     ----- 注册应用的全局事件、中间件等
-|   |   |-- database.py                         ----- 数据库连接池
+|   |   |-- database.py                         ----- 数据库连接
 |   |   |-- handle_exception.py                 ----- 异常处理器
 |   |   |-- logging_provider.py                 ----- 集成loguru日志系统
 |   |   `-- route_provider.py                   ----- 注册路由文件routes/*
@@ -124,9 +124,9 @@
 
 1. 执行初始化SQL：`/database/migrations/2022_09_07_create_users_table.sql`
 
-2. 启动API：`./main.py`
+2. API：`main.py`
 
-3. 启动调度器： `./scheduler.py`
+3. 调度器： `scheduler.py`
 
 ## 参考
 
