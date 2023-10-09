@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.post("/token", response_model=Token, dependencies=[Depends(get_db)])
-async def token(request_data: OAuth2PasswordRequest):
+def token(request_data: OAuth2PasswordRequest):
     """
     用户名+密码登录
     """
@@ -20,7 +20,7 @@ async def token(request_data: OAuth2PasswordRequest):
 
 
 @router.post("/cellphone/token", response_model=Token, dependencies=[Depends(get_db)])
-async def cellphone_token(request_data: OAuth2CellphoneRequest):
+def cellphone_token(request_data: OAuth2CellphoneRequest):
     """
     手机号+验证码登录
     """

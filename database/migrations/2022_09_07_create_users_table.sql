@@ -13,7 +13,7 @@ CREATE TABLE `users` (
   `gender` varchar(10) CHARACTER SET utf8 NOT NULL DEFAULT 'unknown' COMMENT '性别 male，female',
   `avatar` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '头像',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `udx_username` (`username`),
   UNIQUE KEY `udx_cellphone` (`cellphone`),
