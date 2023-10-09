@@ -124,9 +124,19 @@
 
 1. 执行初始化SQL：`/database/migrations/2022_09_07_create_users_table.sql`
 
-2. API：`main.py`
+2. API
 
-3. 调度器： `scheduler.py`
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8080
+```
+
+3. 调度器
+
+```bash
+python scheduler.py 
+```
+
+关于部署部分，参见我的另一篇文章 [fastapi部署](https://www.kxler.com/2022/10/21/fastapi-deployment-venv-gunicorn-service/)
 
 ## 参考
 
