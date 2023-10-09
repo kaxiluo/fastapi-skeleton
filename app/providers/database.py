@@ -1,9 +1,10 @@
 from contextvars import ContextVar
 
+import redis
 from peewee import _ConnectionState, MySQLDatabase
 from playhouse.pool import PooledMySQLDatabase
 
-from config.database import settings
+from config.database import settings, redis_settings
 
 db_state_default = {"closed": None, "conn": None, "ctx": None, "transactions": None}
 db_state = ContextVar("db_state", default=db_state_default.copy())
@@ -27,11 +28,21 @@ async def reset_db_state():
 
 
 db = MySQLDatabase(
-    settings.DATABASE,
-    user=settings.USER,
-    host=settings.HOST,
-    password=settings.PASSWORD,
-    port=settings.PORT
+    settings.DB_DATABASE,
+    user=settings.DB_USER,
+    host=settings.DB_HOST,
+    password=settings.DB_PASSWORD,
+    port=settings.DB_PORT
 )
 
 db._state = PeeweeConnectionState()
+
+
+# redis
+redis_client = redis.Redis(
+    host=redis_settings.REDIS_HOST,
+    port=redis_settings.REDIS_PORT,
+    db=redis_settings.REDIS_DB,
+    password=redis_settings.REDIS_PASSWORD,
+    decode_responses=True
+)
