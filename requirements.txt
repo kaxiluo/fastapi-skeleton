@@ -9,3 +9,4 @@ pymysql
 passlib[bcrypt]
 pydantic[dotenv]
 python-jose[cryptography]
+redis~=5.0.1

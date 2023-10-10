@@ -1,6 +1,6 @@
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.providers.database import db
+from app.providers.database import db, redis_client
 from config.config import settings
 
 
@@ -22,6 +22,9 @@ def register(app):
     def shutdown():
         if not db.is_closed():
             db.close()
+
+        if redis_client:
+            redis_client.close()
 
 
 def add_global_middleware(app):

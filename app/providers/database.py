@@ -37,12 +37,19 @@ db = MySQLDatabase(
 
 db._state = PeeweeConnectionState()
 
-
 # redis
-redis_client = redis.Redis(
+# redis_client = redis.Redis(
+#     host=redis_settings.REDIS_HOST,
+#     port=redis_settings.REDIS_PORT,
+#     db=redis_settings.REDIS_DB,
+#     password=redis_settings.REDIS_PASSWORD,
+#     decode_responses=True
+# )
+redis_pool = redis.ConnectionPool(
     host=redis_settings.REDIS_HOST,
     port=redis_settings.REDIS_PORT,
     db=redis_settings.REDIS_DB,
     password=redis_settings.REDIS_PASSWORD,
     decode_responses=True
 )
+redis_client = redis.Redis(connection_pool=redis_pool)
