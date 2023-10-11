@@ -1,11 +1,15 @@
+from app.providers.database import redis_client
+from app.support.helper import numeric_random
 from config.config import settings
 
 
 def make(cellphone, expired=180, length=6) -> str:
     """
-    生成随机码，存储到服务端，返回随机码 todo
+    生成随机码，存储到服务端，返回随机码
     """
-    pass
+    code = numeric_random(length)
+    redis_client.setex(_get_redis_key(cellphone), expired, code)
+    return code
 
 
 def check(cellphone, verification_code) -> bool:
@@ -17,6 +21,15 @@ def check(cellphone, verification_code) -> bool:
     if (settings.ENV == 'local' or settings.ENV == 'testing') and verification_code == super_code:
         return True
 
-    # 校验验证码 todo
+    # 校验验证码
+    key = _get_redis_key(cellphone)
+    code = redis_client.get(key)
+    passed = code and code == verification_code
+    # 若通过验证立即删除
+    if passed:
+        redis_client.delete(key)
+    return passed
 
-    return False
+
+def _get_redis_key(cellphone):
+    return 'verification:cellphone:' + cellphone

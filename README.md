@@ -96,7 +96,7 @@
 
 - 系统配置
 
-基于 `pydantic.BaseSettings`，使用 `.env` 文件设置环境变量。配置文件按功能模块划分，默认定义了app基础配置、数据库配置、日志配置、认证配置
+基于 `pydantic.BaseSettings`，使用 `.env` 文件设置环境变量。配置文件按功能模块划分，默认定义了app基础配置、数据库配置(mysql+redis)、日志配置、认证配置
 
 - 数据库 ORM模型
 
@@ -112,7 +112,7 @@
 
 测试登录认证请先执行初始化的SQL：`fastapi-skeleton/database/migrations/*.sql`
 
-注：验证码的存储和校验方法请自行实现
+注：验证码的存储依赖redis
 
 - 调度任务
 
