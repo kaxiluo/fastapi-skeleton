@@ -49,7 +49,7 @@ redis_pool = redis.ConnectionPool(
     host=redis_settings.REDIS_HOST,
     port=redis_settings.REDIS_PORT,
     db=redis_settings.REDIS_DB,
-    password=redis_settings.REDIS_PASSWORD,
+    password=(redis_settings.REDIS_PASSWORD or None),
     decode_responses=True
 )
 redis_client = redis.Redis(connection_pool=redis_pool)

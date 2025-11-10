@@ -1,4 +1,5 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -9,8 +10,11 @@ class Settings(BaseSettings):
     DB_USER: str = 'root'
     DB_PASSWORD: str = '123456'
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
 
 class RedisSettings(BaseSettings):
@@ -19,10 +23,13 @@ class RedisSettings(BaseSettings):
     REDIS_HOST: str = 'localhost'
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    REDIS_PASSWORD: str = None
+    REDIS_PASSWORD: str = ''
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
 
 settings = Settings()

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, ConfigDict, field_serializer
 
 from app.support.helper import format_datetime
 
@@ -14,8 +14,7 @@ class UserBase(BaseModel):
     gender: str
     avatar: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserDetail(UserBase):
@@ -25,6 +24,11 @@ class UserDetail(UserBase):
     state: str
     created_at: datetime
 
-    # validators
-    _format_datetime_email_verified_at = validator('email_verified_at', allow_reuse=True)(format_datetime)
-    _format_datetime_created_at = validator('created_at', allow_reuse=True)(format_datetime)
+    # serializers
+    @field_serializer('email_verified_at', when_used='json')
+    def serialize_email_verified_at(self, value: Optional[datetime]):
+        return format_datetime(value)
+
+    @field_serializer('created_at', when_used='json')
+    def serialize_created_at(self, value: datetime):
+        return format_datetime(value)

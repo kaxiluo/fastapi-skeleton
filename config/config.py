@@ -1,6 +1,6 @@
 import os
 
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -14,12 +14,14 @@ class Settings(BaseSettings):
     SERVER_PORT: int = 8000
 
     URL: str = "http://localhost"
-    TIME_ZONE: str = "RPC"
+    TIME_ZONE: str = "Asia/Shanghai"
 
-    class Config:
-        env_prefix = 'APP_'
-        env_file = ".env"
-        env_file_encoding = 'utf-8'
+    model_config = SettingsConfigDict(
+        env_prefix='APP_',
+        env_file=".env",
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
 
 settings = Settings()

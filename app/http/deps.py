@@ -9,7 +9,7 @@ from app.services.auth import jwt_helper
 from jose import jwt
 
 oauth2_token_schema = OAuth2PasswordBearer(
-    tokenUrl="token"
+    tokenUrl="/api/auth/token"
 )
 
 
