@@ -1,27 +1,41 @@
+"""
+应用配置类
+"""
+
 import os
+from app.utils.config_loader import get_section
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
+class Settings:
+    """应用配置类，从 YAML 配置文件加载"""
 
-class Settings(BaseSettings):
-    NAME: str = "fastapi"
-    DEBUG: bool = False
-    ENV: str = "production"
+    def __init__(self):
+        self._config = get_section('app')
+        self.BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    BASE_PATH: str = os.path.dirname(os.path.dirname((os.path.abspath(__file__))))
+    @property
+    def name(self) -> str:
+        return self._config.get('name', "FastAPI Skeleton")
 
-    SERVER_HOST: str = "0.0.0.0"
-    SERVER_PORT: int = 8000
+    @property
+    def debug(self) -> bool:
+        return self._config.get('debug', False)
 
-    URL: str = "http://localhost"
-    TIME_ZONE: str = "Asia/Shanghai"
+    @property
+    def env(self) -> str:
+        return self._config.get('env', "production")
 
-    model_config = SettingsConfigDict(
-        env_prefix='APP_',
-        env_file=".env",
-        env_file_encoding='utf-8',
-        extra='ignore',
-    )
+    @property
+    def server_host(self) -> str:
+        return self._config.get('server', {}).get('host', "0.0.0.0")
+
+    @property
+    def server_port(self) -> int:
+        return self._config.get('server', {}).get('port', 8000)
+
+    @property
+    def timezone(self) -> str:
+        return self._config.get('timezone', "Asia/Shanghai")
 
 
 settings = Settings()

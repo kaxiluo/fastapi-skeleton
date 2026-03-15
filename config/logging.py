@@ -1,21 +1,23 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from config.config import settings as app_settings
-
 """
-配置参考loguru
+日志配置类
 """
 
+from app.utils.config_loader import get_section
 
-class Settings(BaseSettings):
-    LOG_LEVEL: str = "INFO"
-    LOG_PATH: str = app_settings.BASE_PATH + "/storage/logs/fastapi-{time:YYYY-MM-DD}.log"
-    LOG_RETENTION: str = "14 days"
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding='utf-8',
-        extra='ignore',
-    )
+class Settings:
+    """日志配置类，从 YAML 配置文件加载"""
+
+    def __init__(self):
+        self._config = get_section('logging')
+
+    @property
+    def log_level(self) -> str:
+        return self._config.get('level', 'INFO')
+
+    @property
+    def log_retention_days(self) -> int:
+        return self._config.get('retention_days', 0)
 
 
 settings = Settings()

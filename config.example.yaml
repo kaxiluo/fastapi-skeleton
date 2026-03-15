@@ -1,0 +1,45 @@
+# FastAPI Skeleton 配置文件示例
+# 支持环境变量替换，使用格式：${VAR_NAME:默认值}
+#
+# 使用方法：
+# 1. 复制此文件为 config.yaml
+# 2. 根据实际环境修改配置值
+# 3. 可以使用环境变量替换敏感信息，如：${DB_PASSWORD:your_password}
+
+# 应用基础配置
+app:
+  name: "FastAPI Skeleton"
+  debug: true
+  env: "local"
+  server:
+    host: "0.0.0.0"
+    port: 8000
+  timezone: "Asia/Shanghai"
+
+# 数据库配置
+database:
+  host: "${DB_HOST:127.0.0.1}"
+  port: "${DB_PORT:3306}"
+  database: "${DB_NAME:fastapi}"
+  user: "${DB_USER:root}"
+  password: "${DB_PASSWORD:123456}"
+  enable_sql_logging: false
+  sql_log_level: "INFO"
+
+# Redis配置
+redis:
+  host: "${REDIS_HOST:localhost}"
+  port: "${REDIS_PORT:6379}"
+  db: "${REDIS_DB:0}"
+  password: "${REDIS_PASSWORD:}"
+
+# 日志配置
+logging:
+  level: "DEBUG"
+  retention_days: 0
+
+# JWT认证配置
+auth:
+  jwt_ttl: 1440
+  jwt_secret_key: "${JWT_SECRET:your-secret-key-change-in-production}"
+  jwt_algorithm: "HS256"

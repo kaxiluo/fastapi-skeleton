@@ -3,16 +3,16 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, field_serializer
 
-from app.support.helper import format_datetime
+from app.utils.helper import format_datetime
 
 
 # Shared properties
 class UserBase(BaseModel):
     id: int
     username: str
-    nickname: str
+    nickname: Optional[str] = None
     gender: str
-    avatar: str
+    avatar: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

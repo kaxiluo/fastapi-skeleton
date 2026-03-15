@@ -1,36 +1,67 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
+"""
+数据库配置类
+"""
+
+from app.utils.config_loader import get_section
 
 
-class Settings(BaseSettings):
-    """mysql db"""
-    DB_HOST: str = '127.0.0.1'
-    DB_PORT: int = 3306
-    DB_DATABASE: str = 'fastapi'
-    DB_USER: str = 'root'
-    DB_PASSWORD: str = '123456'
+class DatabaseSettings:
+    """数据库配置类，从 YAML 配置文件加载"""
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding='utf-8',
-        extra='ignore',
-    )
+    def __init__(self):
+        self._config = get_section('database')
+
+    @property
+    def db_host(self) -> str:
+        return self._config.get('host', '127.0.0.1')
+
+    @property
+    def db_port(self) -> int:
+        return self._config.get('port', 3306)
+
+    @property
+    def db_database(self) -> str:
+        return self._config.get('database', 'fastapi')
+
+    @property
+    def db_user(self) -> str:
+        return self._config.get('user', 'root')
+
+    @property
+    def db_password(self) -> str:
+        return self._config.get('password', '123456')
+
+    @property
+    def enable_sql_logging(self) -> bool:
+        return self._config.get('enable_sql_logging', False)
+
+    @property
+    def sql_log_level(self) -> str:
+        return self._config.get('sql_log_level', 'INFO')
 
 
-class RedisSettings(BaseSettings):
-    """redis"""
+class RedisSettings:
+    """Redis 配置类，从 YAML 配置文件加载"""
 
-    REDIS_HOST: str = 'localhost'
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-    REDIS_PASSWORD: str = ''
+    def __init__(self):
+        self._config = get_section('redis')
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding='utf-8',
-        extra='ignore',
-    )
+    @property
+    def redis_host(self) -> str:
+        return self._config.get('host', 'localhost')
+
+    @property
+    def redis_port(self) -> int:
+        return self._config.get('port', 6379)
+
+    @property
+    def redis_db(self) -> int:
+        return self._config.get('db', 0)
+
+    @property
+    def redis_password(self) -> str:
+        return self._config.get('password', '')
 
 
-settings = Settings()
+settings = DatabaseSettings()
 redis_settings = RedisSettings()
