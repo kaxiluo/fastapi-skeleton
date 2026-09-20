@@ -1,22 +1,24 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
-from jose import jwt
-from typing import Any, Union
+import jwt
 
-from config.auth import settings
-
-
-def create_access_token(
-        subject: Union[str, Any], expires_delta: timedelta = None
-) -> str:
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.jwt_ttl)
-    to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
-    return encoded_jwt
+from config.auth import JWT_ALGORITHM, get_auth_settings
 
 
-def get_payload_by_token(encoded_jwt):
-    return jwt.decode(encoded_jwt, settings.jwt_secret_key, algorithms=settings.jwt_algorithm)
+def create_access_token(subject: Any, expires_delta: timedelta | None = None) -> str:
+    settings = get_auth_settings()
+    if expires_delta is None:
+        expires_delta = timedelta(minutes=settings.jwt_ttl)
+    expire = datetime.now(UTC) + expires_delta
+    payload = {"exp": expire, "sub": str(subject)}
+    return jwt.encode(payload, settings.jwt_secret.get_secret_value(), algorithm=JWT_ALGORITHM)
+
+
+def get_payload_by_token(encoded_jwt: str) -> dict:
+    settings = get_auth_settings()
+    return jwt.decode(
+        encoded_jwt,
+        settings.jwt_secret.get_secret_value(),
+        algorithms=[JWT_ALGORITHM],
+    )

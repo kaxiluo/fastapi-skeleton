@@ -1,60 +1,38 @@
-"""
-验证码验证器 - 异步版本
-"""
-
-from app.providers.database import database_manager
+from app.core import redis as core_redis
 from app.utils.helper import numeric_random
-from config.config import settings
+from config.auth import get_auth_settings
+from config.settings import get_app_settings
+
+_DEBUG_CODE_ENVS = {"local", "testing"}
 
 
-async def make(cellphone, expired=180, length=6) -> str:
-    """
-    生成随机码，存储到服务端，返回随机码（异步）
+# 通过 core_redis.get_redis_client() 模块属性调用（而非 from-import 直接绑定），
+# 使测试可 monkeypatch app.core.redis.get_redis_client 生效
 
-    Args:
-        cellphone: 手机号
-        expired: 过期时间（秒），默认 180 秒
-        length: 验证码长度，默认 6 位
 
-    Returns:
-        str: 生成的验证码
-    """
-    code = numeric_random(length)
-    redis = await database_manager.redis
-    await redis.setex(_get_redis_key(cellphone), expired, code)
+def _redis_key(cellphone: str) -> str:
+    return f"verification:cellphone:{cellphone}"
+
+
+async def make(cellphone: str) -> str:
+    ttl = get_auth_settings().verification_code_ttl
+    code = numeric_random(6)
+    await core_redis.get_redis_client().set(_redis_key(cellphone), code, ex=ttl)
     return code
 
 
-async def check(cellphone, verification_code) -> bool:
-    """
-    检查验证码（异步）
-
-    Args:
-        cellphone: 手机号
-        verification_code: 验证码
-
-    Returns:
-        bool: 验证是否通过
-
-    Note:
-        调试环境和本地环境，可使用超级验证码 747380
-    """
-    # 调试环境和本地环境超级验证码
-    super_code = '747380'
-    if (settings.env == 'local' or settings.env == 'testing') and verification_code == super_code:
+async def check(cellphone: str, verification_code: str) -> bool:
+    debug_code = get_auth_settings().debug_verification_code
+    if (
+        get_app_settings().env in _DEBUG_CODE_ENVS
+        and debug_code
+        and verification_code == debug_code
+    ):
         return True
 
-    # 校验验证码
-    key = _get_redis_key(cellphone)
-    redis = await database_manager.redis
-    code = await redis.get(key)
-    passed = code and code == verification_code
-    # 若通过验证立即删除
+    key = _redis_key(cellphone)
+    code = await core_redis.get_redis_client().get(key)
+    passed = code is not None and code == verification_code
     if passed:
-        await redis.delete(key)
+        await core_redis.get_redis_client().delete(key)
     return passed
-
-
-def _get_redis_key(cellphone):
-    """生成 Redis 键名"""
-    return 'verification:cellphone:' + cellphone
