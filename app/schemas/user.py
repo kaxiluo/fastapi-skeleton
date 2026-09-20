@@ -1,34 +1,17 @@
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, field_serializer
-
-from app.utils.helper import format_datetime
+from app.schemas.base import BaseSchema
 
 
-# Shared properties
-class UserBase(BaseModel):
+class UserDetail(BaseSchema):
     id: int
     username: str
-    nickname: Optional[str] = None
+    nickname: str | None = None
     gender: str
-    avatar: Optional[str] = None
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserDetail(UserBase):
-    cellphone: Optional[str] = None
-    email: Optional[str] = None
-    email_verified_at: Optional[datetime] = None
+    avatar: str | None = None
+    cellphone: str | None = None
+    email: str | None = None
+    email_verified_at: datetime | None = None
     state: str
     created_at: datetime
-
-    # serializers
-    @field_serializer('email_verified_at', when_used='json')
-    def serialize_email_verified_at(self, value: Optional[datetime]):
-        return format_datetime(value)
-
-    @field_serializer('created_at', when_used='json')
-    def serialize_created_at(self, value: datetime):
-        return format_datetime(value)
+    updated_at: datetime

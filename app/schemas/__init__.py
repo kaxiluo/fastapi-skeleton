@@ -1,12 +1,5 @@
-"""
-Pydantic 数据模型
-"""
+from app.schemas.auth import ErrorResponse, Token
+from app.schemas.base import BaseSchema
+from app.schemas.user import UserDetail
 
-from app.schemas.auth import Token
-from app.schemas.user import UserBase, UserDetail
-
-__all__ = [
-    "Token",
-    "UserBase",
-    "UserDetail",
-]
+__all__ = ["BaseSchema", "ErrorResponse", "Token", "UserDetail"]

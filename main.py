@@ -1,83 +1,38 @@
-#!/usr/bin/env python3
-"""
-FastAPI Skeleton Web API 服务启动器
-"""
-
-import asyncio
-import sys
-import os
-
 from fastapi import FastAPI
-from config.config import settings
-import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
-# 导入应用提供者和日志配置
-from app.providers import app_provider, handle_exception, route_provider
-from app.providers.logging_provider import configure_web_logging
-
-# 创建全局应用实例
-app = FastAPI(
-    title=settings.name,
-    debug=settings.debug
+from app.core.lifespan import lifespan
+from app.core.logging import configure_logging
+from app.core.middleware import RequestContextMiddleware
+from app.exceptions.handlers import register_exception_handlers
+from config.settings import (
+    API_V1_PREFIX,
+    CORS_ALLOW_CREDENTIALS,
+    CORS_ORIGINS,
+    get_app_settings,
+    validate_runtime_safety,
 )
+from routes.api import api_router
 
 
-async def create_app():
-    """创建并配置应用实例（供测试使用）"""
-    # 创建应用实例
-    test_app = FastAPI(
-        title=settings.name,
-        debug=settings.debug
+def create_app() -> FastAPI:
+    validate_runtime_safety()
+    settings = get_app_settings()
+    configure_logging()
+    app = FastAPI(title=settings.name, debug=settings.debug, lifespan=lifespan)
+
+    app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=CORS_ALLOW_CREDENTIALS,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
-    # 注册提供者
-    await app_provider.register(test_app)
-    handle_exception.register(test_app)
-
-    # 启动路由提供者
-    route_provider.boot(test_app)
-
-    return test_app
+    register_exception_handlers(app)
+    app.include_router(api_router, prefix=API_V1_PREFIX)
+    return app
 
 
-def main():
-    """启动 Web API 服务"""
-    print("=" * 50)
-    print("FastAPI Skeleton Web API Service")
-    print("=" * 50)
-    print(f"Starting server on {settings.server_host}:{settings.server_port}")
-    print("Press Ctrl+C to stop")
-    print()
-
-    # 配置 Web 服务的日志系统（包括 uvicorn 特殊处理）
-    configure_web_logging()
-
-    # 设置应用
-    async def init_app():
-        # 注册提供者
-        await app_provider.register(app)
-        handle_exception.register(app)
-        # 启动路由提供者
-        route_provider.boot(app)
-
-    asyncio.run(init_app())
-
-    # 启动 uvicorn 服务器
-    uvicorn.run(
-        app,
-        host=settings.server_host,
-        port=settings.server_port,
-        log_config=None,  # 禁用 uvicorn 默认的日志配置
-        access_log=False,
-        reload=False
-    )
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nServer stopped gracefully")
-    except Exception as e:
-        print(f"Error starting server: {e}")
-        sys.exit(1)
+app = create_app()
