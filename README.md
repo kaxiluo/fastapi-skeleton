@@ -1,122 +1,69 @@
 # FastAPI Skeleton
 
-基于 FastAPI + SQLModel + SQLAlchemy 2.0 的异步 API 项目骨架，完全异步化，开箱即用。
+FastAPI 异步骨架：MySQL + Redis + APScheduler，SQLAlchemy 2.0 异步 ORM、pydantic-settings
+配置、RFC7807 风格错误契约、structlog 结构化日志、Alembic 迁移、unit/integration 双层测试。
 
-## 环境要求
+要求：Python 3.13+ / [uv](https://docs.astral.sh/uv/) / MySQL 5.7+ / Redis
 
-- Python 3.12+
-- MySQL 5.7+
-- Redis
-- uv (Python 包管理器)
-
-## 安装依赖
+## 快速开始
 
 ```bash
-# 开发环境
-uv sync --frozen --no-install-project
-
-# 生产环境
-uv sync --frozen --no-dev --no-install-project
+uv sync
+cp .env.example .env        # 填 DB/Redis/AUTH_JWT_SECRET
+make upgrade                # alembic 建库（种子用户 fake_user1/2，密码 123456）
+make dev                    # uv run uvicorn main:app --reload
 ```
 
-## 配置
+## 常用命令
 
-复制 `config.example.yaml` 为 `config.yaml`，并根据实际环境修改配置：
+| 命令 | 作用 |
+|---|---|
+| `make install` / `make dev` | 安装依赖 / 本地起服务 |
+| `make test` | unit 测试（默认排除 integration） |
+| `make test-integration` | integration 测试（需 `.env.test`，见 `.env.test.example`） |
+| `make lint` / `make format` | ruff + import-linter / 格式化 |
+| `make migrate m="msg"` / `make upgrade` | 生成迁移 / 执行迁移 |
+| `uv run python scheduler.py` | 启动调度器 |
 
-```bash
-cp config.example.yaml config.yaml
-```
-
-配置支持环境变量替换，格式：`${VAR_NAME:默认值}`
-
-## 启动服务
-
-### Web API 服务
-```bash
-uv run main.py
-```
-
-### 定时任务调度器
-```bash
-uv run scheduler.py
-```
-
-## 项目结构
+## 目录结构
 
 ```
-fastapi-skeleton/
-├── main.py                 # Web API 服务启动器
-├── scheduler.py            # 定时任务调度器启动器
-├── config.yaml             # 配置文件（不提交到版本控制）
-├── config.example.yaml     # 配置文件示例
-├── pyproject.toml          # uv 依赖配置
-├── uv.toml                 # uv 配置
+├── main.py / scheduler.py     # Web / 调度器入口
+├── alembic/                   # 数据库迁移
+├── config/                    # pydantic-settings 配置 + 结构常量
+├── routes/                    # 路由聚合
 ├── app/
-│   ├── exceptions/         # 自定义异常
-│   ├── http/               # HTTP 层
-│   │   ├── api/           # API 路由
-│   │   └── deps.py        # 依赖注入
-│   ├── jobs/               # 定时任务
-│   │   ├── base_job.py    # Job 基类
-│   │   ├── job_registry.py# Job 注册器
-│   │   └── demo_job.py    # 示例任务
-│   ├── models/             # 数据模型（SQLModel）
-│   │   ├── base_model.py  # 基础模型
-│   │   └── user.py        # 用户模型
-│   ├── providers/          # 服务提供者
-│   │   ├── app_provider.py # 应用配置
-│   │   ├── database.py    # 数据库连接（异步）
-│   │   ├── logging_provider.py
-│   │   ├── handle_exception.py
-│   │   └── route_provider.py
-│   ├── schemas/            # Pydantic 模型
-│   ├── services/           # 业务逻辑（异步）
-│   │   └── auth/          # 认证服务
-│   └── utils/              # 工具类
-├── config/                 # 配置类
-└── routes/                 # 路由聚合
+│   ├── core/                  # 基础设施：db/redis、lifespan、日志、中间件
+│   ├── http/                  # 入口层：deps（事务边界）+ API 路由
+│   ├── jobs/                  # 定时任务（显式注册表）
+│   ├── services/              # 业务逻辑
+│   ├── repositories/          # 仓储
+│   ├── models/                # SQLAlchemy 模型
+│   ├── schemas/               # 响应模型（datetime 统一时区格式化）
+│   ├── exceptions/            # AppError 体系 + 全局处理器
+│   └── utils/
+└── tests/{unit,integration}/
 ```
 
-## 核心特性
+## 分层契约
 
-### 异步架构
-- 完全异步化的路由、服务、数据库访问
-- SQLAlchemy 2.0 + aiomysql
-- Redis 异步客户端
+`app.http / app.jobs` > `app.services` > `app.repositories` > `app.models`，由 import-linter
+强制（`make lint`）；`app.core` / `app.exceptions` / `app.utils` 为叶子模块，禁止依赖业务层。
 
-### 配置管理
-- YAML 配置文件
-- 环境变量替换
-- 按功能模块划分配置
+**事务边界只在入口层**：HTTP 请求由 `get_db_session` 统一 commit/rollback，Job 自管
+session；service / repository 永不 commit。
 
-### 认证系统
-- JWT 认证
-- 用户名+密码登录
-- 手机号+验证码登录
+## 错误契约
 
-### 日志系统
-- 基于标准库 logging
-- 时区感知
-- 文件轮转
-- 分级日志
+错误响应统一 `{"type", "title", "detail"}`（RFC7807 风格），业务代码抛 `AppError` 子类；
+FastAPI 参数校验 422 的 `detail` 为错误数组；生产环境 500 不泄露内部 detail。
 
-### 定时任务
-- 基于 APScheduler
-- 自动发现和注册
-- 异步执行
+## 认证
 
-### 中间件
-- 全局 CORS 中间件
+| 端点 | 说明 |
+|---|---|
+| `POST /api/v1/auth/token` | 用户名 + 密码 |
+| `POST /api/v1/auth/cellphone/token` | 手机号 + 验证码（通过即自动注册） |
+| `POST /api/v1/auth/cellphone/verification_code` | 发码（限流：60s 间隔 + 每日上限） |
 
-### 异常处理
-- 统一的异常处理器
-- 认证异常类
-
-## 设计思想
-
-- 层级结构清晰
-- 简洁优雅
-- 易于扩展
-- 开箱即用
-
-代码结构组织风格参考 [Laravel 框架](https://github.com/laravel/laravel)
+万能验证码仅 `APP_ENV ∈ {local, testing}` 且 `AUTH_DEBUG_VERIFICATION_CODE` 非空时生效。
