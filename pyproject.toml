@@ -1,28 +1,76 @@
 [project]
 name = "fastapi-skeleton"
-version = "1.0.0"
-requires-python = ">=3.12"
+version = "2.0.0"
+requires-python = ">=3.13"
 dependencies = [
-    "fastapi>=0.115,<1.0",
-    "sqlmodel>=0.0.14",
-    "sqlalchemy[asyncio]>=2.0.0",
-    "aiomysql>=0.2.0",
-    "uvicorn[standard]~=0.30",
-    "passlib[bcrypt]~=1.7.4",
-    "bcrypt<4",
-    "pydantic>=2,<3",
-    "pyyaml>=6,<7",
-    "redis~=5.1",
-    "python-jose[cryptography]>=3.3,<4.0",
-    "python-multipart>=0.0.6",
-    "apscheduler>=3.10.0",
-    "tzdata>=2024.0",
+    "fastapi>=0.141,<1",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "aiomysql>=0.3,<1",
+    "uvicorn[standard]>=0.53,<1",
+    "pydantic>=2.13,<3",
+    "pydantic-settings>=2.15,<3",
+    "alembic>=1.20,<2",
+    "structlog>=26.1,<27",
+    "pyjwt>=2.14,<3",
+    "pwdlib[bcrypt]>=0.3,<1",
+    "httpx>=0.28,<1",
+    "redis>=8.1,<9",
+    "python-multipart>=0.0.32",
+    "apscheduler>=3.11,<4",
+    "tzdata>=2026.4",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "httpx>=0.24.0",
+[dependency-groups]
+dev = [
+    "ruff>=0.16,<1",
+    "pytest>=9.1,<10",
+    "pytest-asyncio>=1.4,<2",
+    "pytest-cov>=7.1,<8",
+    "asgi-lifespan>=2.1,<3",
+    "import-linter>=2.15,<3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "N"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Body"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-m 'not integration'"
+markers = [
+    "integration: requires real MySQL/Redis (deselected by default; run with -m integration)",
+]
+
+[tool.importlinter]
+root_package = "app"
+
+[[tool.importlinter.contracts]]
+name = "App layering"
+type = "layers"
+layers = [
+    "app.http | app.jobs",
+    "app.services",
+    "app.repositories",
+    "app.models",
+]
+
+[[tool.importlinter.contracts]]
+name = "Leaf modules must not import business layers"
+type = "forbidden"
+source_modules = ["app.core", "app.exceptions", "app.utils", "app.schemas"]
+forbidden_modules = [
+    "app.services",
+    "app.repositories",
+    "app.models",
+    "app.http",
+    "app.jobs",
 ]
