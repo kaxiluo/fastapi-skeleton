@@ -1,45 +1,26 @@
-"""
-时区工具类
-"""
-
-import os
-import time
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
-# 时区配置
-TZ = ZoneInfo("Asia/Shanghai")
+from config.settings import get_app_settings
 
 
-def setup_timezone():
-    """
-    设置应用时区
-
-    注意：在 Windows 上，time.tzset() 不可用，会抛出 AttributeError
-    """
-    os.environ['TZ'] = 'Asia/Shanghai'
-    try:
-        time.tzset()
-    except AttributeError:
-        # Windows 系统不支持 tzset()
-        pass
+def get_timezone() -> ZoneInfo:
+    return ZoneInfo(get_app_settings().timezone)
 
 
-def get_timezone():
-    """
-    获取时区对象
-
-    Returns:
-        ZoneInfo: 时区对象
-    """
-    return TZ
+def now() -> datetime:
+    return datetime.now(get_timezone())
 
 
-def now_with_timezone():
-    """
-    获取带时区的当前时间
+def format_datetime(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    tz = get_timezone()
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=tz)
+    return value.astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
 
-    Returns:
-        datetime: 带时区的当前时间
-    """
-    from datetime import datetime
-    return datetime.now(TZ)
+
+def mysql_timezone_offset() -> str:
+    offset = now().strftime("%z")  # e.g. "+0800"
+    return f"{offset[:3]}:{offset[3:]}"
